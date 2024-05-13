@@ -39,7 +39,7 @@ export default function Home(): JSX.Element {
   }, [start]);
 
   return (
-    <div className="flex items-start justify-center flex-col mx-[25%]">
+    <div className="flex items-start justify-center flex-col mx-[25%] rounded shadow-sm p-10">
       <div className="mx-auto mb-[50px]">
         <p className="text-3xl font-bold">
           Прежде, чем пользоваться системой, изучите инструкцию в разделе

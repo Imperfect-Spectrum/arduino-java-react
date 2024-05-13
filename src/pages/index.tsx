@@ -68,10 +68,6 @@ export default function Home(): JSX.Element {
                       if (!response.ok) {
                         throw new Error("Network response was not ok");
                       }
-                      return response.json();
-                    })
-                    .then((data) => {
-                      console.log("Start operation response:", data);
                       setStart(true);
                     })
                     .catch((error) => {
@@ -105,10 +101,12 @@ export default function Home(): JSX.Element {
                       if (!response.ok) {
                         throw new Error("Network response was not ok");
                       }
-                      return response.json();
-                    })
-                    .then((data) => {
-                      console.log("Start operation response:", data);
+                      setData((prevData) => ({
+                        switch1: 0,
+                        switch2: 0,
+                        pump: 0,
+                        valve: 0,
+                      }));
                       setStart(false);
                     })
                     .catch((error) => {

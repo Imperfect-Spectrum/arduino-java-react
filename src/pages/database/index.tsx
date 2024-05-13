@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import axios from "axios";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface Operation {
   log_start: string;
@@ -38,70 +38,24 @@ type OperationData = {
 };
 
 const DataBase: React.FC = () => {
-  const data: OperationData[] = [
-    {
-      idOperation: 7,
-      operation: {
-        log_end: "2024-05-12T15:19:57.686+00:00",
-        log_work: 31,
-        log_start: "2024-05-12T15:19:25.852+00:00",
-      },
-      sensors: [
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:19:34.957+00:00",
-          log_start: "2024-05-12T15:19:34.957+00:00",
-          sensor1: 2,
-        },
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:19:34.957+00:00",
-          log_start: "2024-05-12T15:19:34.957+00:00",
-          sensor1: 2,
-        },
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:19:34.957+00:00",
-          log_start: "2024-05-12T15:19:34.957+00:00",
-          sensor1: 2,
-        },
-      ],
-    },
-    {
-      idOperation: 8,
-      operation: {
-        log_end: "2024-05-12T15:20:35.023+00:00",
-        log_work: 10,
-        log_start: "2024-05-12T15:20:24.770+00:00",
-      },
-      sensors: [
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:20:32.284+00:00",
-          log_start: "2024-05-12T15:20:32.284+00:00",
-          sensor1: 2,
-        },
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:20:32.284+00:00",
-          log_start: "2024-05-12T15:20:32.284+00:00",
-          sensor1: 2,
-        },
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:20:32.284+00:00",
-          log_start: "2024-05-12T15:20:32.284+00:00",
-          sensor1: 2,
-        },
-        {
-          sensor2: 1,
-          log_end: "2024-05-12T15:20:32.284+00:00",
-          log_start: "2024-05-12T15:20:32.284+00:00",
-          sensor1: 2,
-        },
-      ],
-    },
-  ];
+  const [dataTable, setDataTable] = useState<OperationData[] | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get<OperationData[]>(
+          "http://localhost:8080/getLogs"
+        );
+        setDataTable(response.data);
+      } catch (error) {
+        console.error("Ошибка при получении данных:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const columns: ColumnDef<OperationData>[] = [
     {
@@ -123,7 +77,7 @@ const DataBase: React.FC = () => {
   ];
 
   const table = useReactTable({
-    data: data,
+    data: dataTable || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -183,15 +137,3 @@ const DataBase: React.FC = () => {
 };
 
 export default DataBase;
-
-export async function getServerSideProps() {
-  try {
-    const response = await axios.get<OperationData[]>("");
-
-    const data = response.data;
-
-    return { props: { data } };
-  } catch (error) {
-    return { props: { data: [] } };
-  }
-}

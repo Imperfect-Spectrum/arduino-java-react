@@ -38,57 +38,106 @@ export default function Home(): JSX.Element {
     return () => clearInterval(interval);
   }, [start]);
 
+  const [selectedUser, setSelectedUser] = useState("");
+
+  const handleSelectChange = (event: any) => {
+    setSelectedUser(event.target.value);
+  };
+
   return (
     <div className="flex items-start justify-center flex-col mx-[25%] rounded shadow-sm p-10">
       <div className="mx-auto mb-[50px]">
         <p className="text-3xl font-bold">
           Прежде, чем пользоваться системой, изучите инструкцию в разделе
-          “Инструкция”
+          “Инструкция” и выберите пользователя, который будет работать с
+          системой
         </p>
       </div>
 
       <div className="flex items-center justify-around gap-5 mx-auto w-[100%]">
         <div className="flex flex-col items-center justify-center gap-5">
-          <div className="w-[40%] flex justify-center items-center">
+          <div className="w-[60%] flex justify-center items-center">
             <div className="flex flex-col items-center gap-5">
               <p className="text-4xl font-bold text-wrap text-center">
-                Для того, чтобы запустить систему, нажмите “Запуск”
+                Для того, чтобы запустить систему, выберите пользователя и
+                нажмите “Запуск”
               </p>
-              <button
-                className=" w-[50%] h-20 text-white text-2xl bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                onClick={() => {
-                  fetch("http://localhost:8080/startOperation", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({}),
-                  })
-                    .then((response) => {
-                      if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                      }
-                      setStart(true);
+
+              <div className="flex gap-5 w-full justify-around">
+                <form className="w-[30%]">
+                  <label className="block mb-2 text-sm font-medium text-dark">
+                    Выберите пользователя
+                  </label>
+                  <select
+                    id="countries"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={selectedUser}
+                    onChange={handleSelectChange}
+                    disabled={start === true}
+                  >
+                    <option selected>Пользователи</option>
+                    <option value="Миша">Миша</option>
+                    <option value="Никита">Никита</option>
+                    <option value="Артем">Артем</option>
+                    <option value="Денис Вадимович">Денис Вадимович</option>
+                  </select>
+                </form>
+                <button
+                  className={`w-[50%] h-20 text-white text-2xl ${
+                    selectedUser === "" || start
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-700 hover:bg-blue-800"
+                  } focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:focus:ring-blue-800`}
+                  onClick={() => {
+                    if (!selectedUser) {
+                      console.error("No selected user!");
+                      return;
+                    }
+
+                    // Создаем пейлоад
+                    const payload = {
+                      user: selectedUser,
+                    };
+
+                    // Выполняем POST запрос
+                    fetch("http://localhost:8080/startOperation", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(payload),
                     })
-                    .catch((error) => {
-                      console.error(
-                        "There was a problem with the start operation:",
-                        error
-                      );
-                    });
-                }}
-              >
-                Запуск
-              </button>
+                      .then((response) => {
+                        if (!response.ok) {
+                          throw new Error("Network response was not ok");
+                        }
+                        setStart(true);
+                      })
+                      .catch((error) => {
+                        console.error(
+                          "There was a problem with the start operation:",
+                          error
+                        );
+                      });
+                  }}
+                  disabled={selectedUser === "" || start === true}
+                >
+                  Запуск
+                </button>
+              </div>
             </div>
           </div>
-          <div className="w-[40%] flex justify-center items-center">
+          <div className="w-[60%] flex justify-center items-center">
             <div className="flex flex-col items-center gap-5">
               <p className="text-4xl font-bold text-wrap text-center">
                 Для того, чтобы отключить систему, нажмите “Стоп”
               </p>
               <button
-                className="w-[50%] h-20 text-white text-2xl bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className={`w-[50%] h-20 text-white text-2xl ${
+                  start
+                    ? "bg-blue-700 hover:bg-blue-800"
+                    : "bg-red-500 hover:bg-red-600"
+                } focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:focus:ring-blue-800`}
                 onClick={() => {
                   fetch("http://localhost:8080/endOperation", {
                     method: "POST",
@@ -158,7 +207,7 @@ export default function Home(): JSX.Element {
             <div
               className={`p-10 border-4 w-[100%] text-center font-semibold rounded-2xl ${
                 data.pump !== null && data.pump !== 0
-                  ? "bg-green-400"
+                  ? "bg-green-400 animation-pulse"
                   : "bg-red-400"
               }`}
             >
